@@ -229,11 +229,60 @@ minikube addons enable metrics-server
 
 • - How can you simulate load to test if the HPA works? Explain briefly. (3 points) 
 
+```
+kubectl run -i --tty load-generator --image=busybox /bin/sh
+# inside pod:
+while true; do wget -q -O- http://nginx-service; done
+```
+
+<img width="671" height="598" alt="image" src="https://github.com/user-attachments/assets/72f38b7f-ee75-45d3-8b06-6072b466d618" />
+
+<img width="731" height="103" alt="image" src="https://github.com/user-attachments/assets/eb3848e3-2e42-4772-bc9b-b9ffc81b0715" />
+
+<img width="747" height="114" alt="image" src="https://github.com/user-attachments/assets/fd5aac60-5eca-438c-890e-c5021b4a034d" />
+
+
 6. Monitoring & Debugging (10 points)
 • - Use `kubectl describe` and `kubectl logs` to troubleshoot a failing Pod. Share your observations. (5 points)
+For this use case I will create a pod with a faulty container image, in order to better observe and conduct the examination.
+
+```
+kubectl run faulty-pod --image busybox:777
+```
+<img width="701" height="183" alt="image" src="https://github.com/user-attachments/assets/1f5ecc3f-8710-49f5-82ee-fd134e8c5ac1" />
+
+The pod is in state ImagePullBackOff so let's investigate:
+
+```
+kubectl get pods
+kubectl describe pod faulty-pod
+```
+<img width="974" height="183" alt="image" src="https://github.com/user-attachments/assets/39b84bea-f676-4ccc-a6b8-7d5f89753392" />
+
+```
+kubectl logs faulty-pod
+```
+
+<img width="924" height="31" alt="image" src="https://github.com/user-attachments/assets/f82b874c-08b1-455f-b9e2-9f1710583962" />
+
+Image pull issues (ImagePullBackOff) occur when the image name or tag is wrong; fix by correcting the image in the Deployment.
+
+Use
+
+```
+kubectl edit pod faulty-pod
+
+```
+to fix the name of the image.
+
 • - List 3 common reasons why a Pod might be in CrashLoopBackOff and how to fix them. (5 points)
 
-7. EKS and IAM Integration (15 points)
+- if the pod uses too many resources and exceeds the CPU/memory limit it gets killed by the kubelet agent
+- application crashes at startup due to an error in the container's main process, scrip/command/entrypoint error
+- environment variables are configured incorrectly
+
+
+8. EKS and IAM Integration (15 points)
 • - Explain the difference between managed node groups and Fargate profiles in EKS. (5 points)
 • - Create an IAM role and associate it with a Kubernetes Service Account using IRSA (IAM Roles for Service Accounts). Share the steps. (10 points)
 
