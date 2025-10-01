@@ -2,21 +2,27 @@ Section 1: Core Concepts
 __Q1.1 – Free Answer Points__
 What is a Docker container and how is it different from a virtual machine?
 
-Docker containers are a basic unit of software used for packiging application code and its dependencies, making it easy to run it in any environment. Containers abstractize at the OS level, and they share the same kernel with their host, unlike virtual machines which have individual operationg systems.
-Containerele are more lightweight which implies a faster start and less used resources while compared to virtual machines.
+Docker containers are a basic unit of software used for packiging application code and its libraries and dependencies, making it easy to run it in any environment. Containers abstractize at the OS level, and they share the same kernel with their host, unlike virtual machines which have individual operationg systems.
+Given the previous statement, containers are more lightweight, start faster, and are less resource-intensive than virtual machines.
+
+Both containers and virtual machines can be powerful tools when used in the correct context. If you need to run a heavy workload, legacy application or are desire strong isolation - virtual machines are the answear. If you need to deploy microservices in a CI/CD environment and want portability and scalability - containers are the way to go.
 
 __Q1.2 – Multiple Choice Points__
 Match the Docker command to its function:
 
-docker build ---> build image for Dockerfile
-docker ps    ---> show running containers
-docker run   ---> run a container
+```docker build``` ---> build image for Dockerfile
+```docker ps```    ---> show running containers
+```docker run```   ---> run a container
 
 __Q1.3 – Free Answer Points__
 Name three reasons why Docker is useful in modern DevOps pipelines.
-1. Docker improves collaboration between teams and ensures consistency accross multiple environments. The same containers can be run and deployed in the same way accross multiple environments (prod and non-prod).
-2. Docker facilitates the CI/CD process by allowing the build of the images to be integrated in the CI process and the download and run of the images in the CD pipelines.
-3. Docker speeds up the pipeline run time by using caching of the image levels; if nothing changes in the image layer then those layeres are cached, making for a faster time.
+
+1. Docker ensures that the same code can be used and adapted for multiple enviroments. The same containers can be run and deployed in the same way in development, testing and production environments, improving collaboration and reducing environment-related issues. Therefore, the same CI/CD pipelines can be used for all environments, the isolation between resources being assured by the containers.
+   
+2. Docker facilitates the CI/CD process - images can be built and tested during the CI, and then deployed during the CD.
+   
+3. Docker speeds up the pipeline run time by using caching of the image levels; if nothing changes in the image layer then those layeres are cached, thus reducing build and deployment times.
+
 4. Docker allows isolation of the containers, and this integrates well with the microservices achitecture, making the deployment process separate for each microservice.
 
 __Q1.4 – Multiple Choice Points__
@@ -25,22 +31,41 @@ Identify whether the following statements are True or False:
 Docker images are not mutable, once they are created they are **immutable**, they can't be modified after creation. If there is any code change at the image level, it needs to be recreated.
 
 2. Containers can communicate over user-defined networks. __**TRUE**__
-Yes, generally speaking, Docker containers use the bridge networkn for communicating, but the option of them communicating over user-defined networks still exists. in fact this is the case for Docker Compose.
+Yes, Docker containers use the bridge network for communicating, but the option of them communicating over user-defined networks still exists - this is the case for Docker Compose.
 
 3. The CMD instruction in Dockerfile overrides ENTRYPOINT. __**FALSE**__
 
+CMD does *NOT* ovveride ENTRYPOINT; if provides default arguments to ENTRYPOINT.
 
 __Q1.5 – Free Answer Points__
 What is the difference between a bind mount and a named volume in Docker?
 Docker containers are stateless by default, but we use the following storage options to make them persisstent after restart:
 - bind mounds: used mainly during the development process for maping a local path on the docker container.
-- named volumes: this is a Docker native solution that uses external storage that can be shared across multiple containers.
+- named volumes: used in production grade environments, this is a Docker native solution that uses external storage that can be shared across multiple containers.
 
 __**Section 2: Dockerfile and Image Building**__
 __Q2.1 – Coding Points__
 Given a Python app with app.py and requirements.txt, write a basic Dockerfile to build and run it.
 
-The Dockerfile used for this section can be found in **q2.1/**.
+The Dockerfile used for this section can be found in **q2.1/**, but also bellow:
+
+```
+FROM python:3.12
+
+WORKDIR /project
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app.py .
+
+EXPOSE 5000
+
+CMD ["python", "app.py"]
+
+```
+
 Steps to reproduce:
 
 - First run the following command in the root of **q2.1/** in order to build the Docker image:
