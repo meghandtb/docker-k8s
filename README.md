@@ -11,8 +11,13 @@ __Q1.2 – Multiple Choice Points__
 Match the Docker command to its function:
 
 ```docker build``` ---> build image for Dockerfile
+
+
 ```docker ps```    ---> show running containers
+
+
 ```docker run```   ---> run a container
+
 
 __Q1.3 – Free Answer Points__
 Name three reasons why Docker is useful in modern DevOps pipelines.
@@ -78,16 +83,25 @@ docker images
 
 - Then run the Docker container:
 ```
-docker run -p 8090:5000 flask-docker-app
+docker run -p 8090:5000 --name flask-container-q21 flask-docker-app
 docker ps
 ```
 
+<img width="855" height="168" alt="image" src="https://github.com/user-attachments/assets/1c4d31f4-a326-4dfd-a214-194eac37f7a9" />
+
+<img width="1074" height="54" alt="image" src="https://github.com/user-attachments/assets/441f0f68-e679-4eea-8726-e3c8444de513" />
+
+Now the application is running on port 5000 on the container, and port 8090 on localhost, so we can access it like so:
+
+<img width="543" height="192" alt="image" src="https://github.com/user-attachments/assets/b3cbdac1-4368-4a70-96e4-88f1da267c9d" />
+
+
 __Q2.2 – Coding Points__
 Modify the above Dockerfile to use a multi-stage build with no pip/build tools in final image.
-The Dockerfile used for this section can be found in **q2.1/**.
+The Dockerfile used for this section can be found in **q2.2/**.
 Steps to reproduce:
 
-- First run the following command in the root of **q2.1/** in order to build the Docker image:
+- First run the following command in the root of **q2.2/** in order to build the Docker image:
 ```
 docker build -t multi-stage .
 docker images
