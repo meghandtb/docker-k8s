@@ -96,6 +96,7 @@ Now the application is running on port 5000 on the container, and port 8090 on l
 <img width="543" height="192" alt="image" src="https://github.com/user-attachments/assets/b3cbdac1-4368-4a70-96e4-88f1da267c9d" />
 
 
+
 __Q2.2 – Coding Points__
 Modify the above Dockerfile to use a multi-stage build with no pip/build tools in final image.
 The Dockerfile used for this section can be found in **q2.2/**.
@@ -106,14 +107,21 @@ Steps to reproduce:
 docker build -t multi-stage .
 docker images
 ```
-<img width="605" height="58" alt="image" src="https://github.com/user-attachments/assets/5d71dfab-2c0c-4108-a3b8-18000c1b42ce" />
 
+<img width="517" height="58" alt="image" src="https://github.com/user-attachments/assets/604b5e48-9870-4a6e-8eec-15cfd2fcf88c" />
 
 - Then run the Docker container:
 ```
 docker run -p 8090:5000 multi-stage
 docker ps
 ```
+<img width="859" height="157" alt="image" src="https://github.com/user-attachments/assets/e1eab827-e161-4024-8bfa-c84f04530a39" />
+
+
+<img width="1021" height="52" alt="image" src="https://github.com/user-attachments/assets/46e34834-592d-444a-92eb-25148c59c99f" />
+
+
+<img width="460" height="207" alt="image" src="https://github.com/user-attachments/assets/285bedf1-6e83-4eca-9e16-b65e6b982185" />
 
 
 __Q2.3 – Free Answer Points__
