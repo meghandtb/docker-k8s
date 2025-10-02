@@ -99,7 +99,37 @@ Now the application is running on port 5000 on the container, and port 8090 on l
 
 __Q2.2 – Coding Points__
 Modify the above Dockerfile to use a multi-stage build with no pip/build tools in final image.
-The Dockerfile used for this section can be found in **q2.2/**.
+The Dockerfile used for this section can be found in **q2.2/** or bellow:
+
+```
+FROM python:3.11-slim AS builder
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY --from=builder /install /usr/local
+
+COPY app.py .
+
+EXPOSE 5000
+
+CMD ["python", "app.py"]
+
+
+```
+
 Steps to reproduce:
 
 - First run the following command in the root of **q2.2/** in order to build the Docker image:
@@ -126,17 +156,60 @@ docker ps
 
 __Q2.3 – Free Answer Points__
 Explain how Docker layer caching works and how it helps with CI/CD pipelines.
-for the image creation process Docker uses caching, meaning every command in a dockerfile RUN,CMD, COPY creates a layer in the cache. If a change is detected at the layer level then the layer gets recreated, if nothing changes the already exiting cache is used. Therefore, a best practice is to maintain the same command order between image builds, as to n ot mess with the cache layers.
-In the context of CI/CD pipelines the layer caching helps in improving pipeline execution time and in reducing the amount of used resources.
+
+In Docker, every instruction in a Dockerfile (such as ```FROM```, ```RUN```, ```COPY```, ```CMD```) creates a new image layer. Docker caches these layers locally, so if a change is detected at the layer level then the layer and all its subsequent onds get recreated, if nothing changes the already existing cache is used. Therefore, a best practice is to maintain the same command order between image builds, as to avoid interfering with the cache layers.
+
+In the context of CI/CD pipelines, the caching mechanism is especially useful in improving pipeline execution time and in reducing the amount of used resources. For example, dependencies installed early in the Dockerfile (e.g., ```pip install``` or ```apt-get install```) can be cached across builds if source code changes occur later in the file.
 
 __**Section 3: Docker Networking, Volumes, and Compose**__
 __Q3.1 – Coding Points__
 Write a docker-compose.yml file for a Python web app and a Redis container.
 
+```
+version: "3.9"
+
+services:
+  web:
+    build: .
+    container_name: flask-app
+    ports:
+      - "8090:5000"
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis-server
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+
+volumes:
+  redis_data:
+```
+The code for this module can be found in the root of **q3.1/* or above.
+
+Steps to recreate:
+
+```
+docker compose up
+```
+<img width="1184" height="691" alt="image" src="https://github.com/user-attachments/assets/9edaf573-86f5-4351-af22-78bf18ab2b13" />
+
+
+<img width="375" height="203" alt="image" src="https://github.com/user-attachments/assets/b3411e67-0865-440c-b8bb-420abe54714c" />
+
+
 __Q3.2 – Free Answer Points__
 In what scenario would you use Docker Compose instead of running containers manually?
 
-Docker Compose is used when there multiple containers to be run and managed, this can be declared in a singular docker-compose file and deployed togheter. Otherwise, these containers need to be ran manually and handled indicidually. Moreover, Docker Compose adds all of the containers it manages unde a common network which makes it easire for containers to communicate with eachother via name.
+Docker Compose is useful when an application requires multiple containers that must run and work together, such as an application with a database. Instead of starting each container manually with multiple ```docker run``` commands, you can write a singular *docker-compose* file to include all of the application's containers and deploy them togheter. Moreover, Docker Compose adds all of the containers it manages under a common network which makes it easier for containers to communicate with eachother via service name.
 
 __Q3.3 – Multiple Choice Points__
 Which of the following are benefits of using volumes in Docker?
@@ -147,10 +220,62 @@ D. Can be shared between containers
 
 A. B. D.
 
+The only statement that does not match is *C*, since using container does not affect memory usage but storage persistence.
+
 __**Section 4: Challenge**__
 __Q4.1 – Hands-on Coding + Explanation Points__
 You are given a Node.js app that connects to PostgreSQL. Write a docker-compose.yml and explain how to use .env for DB_USER, DB_PASS, and DB_NAME. Add suggestive comments to understand the role of each component used in docker-compose.yml
 
+The docker compose file can be found in the root of *q4.1* of here:
+
+```
+version: "3.9"                     # Docker Compose file format version
+
+services:
+  app:                             # Service definition for the Node.js app
+    build: .                       # Build image from Dockerfile in current directory
+    container_name: node-app        # Name for the running container
+    ports:
+      - "3000:3000"                # Map host port 3000 → container port 3000 (http://localhost:3000)
+    environment:                   # Environment variables passed into the container
+      - DB_USER=${DB_USER}         # Database username (from .env file)
+      - DB_PASS=${DB_PASS}         # Database password (from .env file)
+      - DB_NAME=${DB_NAME}         # Database name (from .env file)
+      - DB_HOST=db                 # Service name "db" acts as hostname inside the Compose network
+      - DB_PORT=5432               # Default PostgreSQL port inside the container
+    depends_on:                    # Ensure DB starts before app tries to connect
+      - db
+    restart: always                # Restart container if it crashes/stops unexpectedly
+
+  db:                              # Service definition for PostgreSQL database
+    image: postgres:16-alpine      # Lightweight official PostgreSQL image
+    container_name: postgres-db     # Name for the running container
+    environment:                   # Pass DB initialization values
+      - POSTGRES_USER=${DB_USER}   # Create DB user (from .env file)
+      - POSTGRES_PASSWORD=${DB_PASS} # Set user password
+      - POSTGRES_DB=${DB_NAME}     # Create database with given name
+    ports:
+      - "5432:5432"                # Expose DB to host (optional, useful for pgAdmin/psql tools)
+    volumes:                       # Persistent storage for DB data
+      - pg_data:/var/lib/postgresql/data
+    restart: always                # Restart DB container if it stops
+
+volumes:
+  pg_data:                         # Named volume to persist database data (lives outside container lifecycle)
+
+```
+
+Run the following command:
+
+```
+docker compose up
+```
+
+<img width="1221" height="259" alt="image" src="https://github.com/user-attachments/assets/39f7dda0-1d07-4901-b385-96f97eab9077" />
+
+Access it at http://localhost:3000/ like so:
+
+<img width="629" height="245" alt="image" src="https://github.com/user-attachments/assets/cc672def-a1ff-4c39-8955-9cb153c97636" />
 
 Kubernetes & EKS Chapter
 Total: 100 points
