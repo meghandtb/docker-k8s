@@ -286,25 +286,29 @@ Install helm
 Good to have: AWS account
 
 1. Kubernetes Core Concepts (10 points)
-• - Explain what a Pod is in your own words. (3 points)
-A pod is the smallest deployable unit in k8s, it is a wrapper over one or multiple containers which share the same network, storage and configuration.
 
-• - What is the role of the kubelet on a worker node? (2 points)
-Kubelet is an agent running on every single worker node in a k8s cluster. It facilitates communication with the control plane and ensures that the pods and container state are running accordingly to the configuration file.
 
-• - List 3 main components of the Kubernetes control plane and their purpose. (5 points)
-control plane ul este creierul k8s, si are urmatoarele componente:
+- Explain what a Pod is in your own words. (3 points)
 
- The control plane can be refered to as the "brain of the k8s cluster". it encapsulates the following components:
- - The API Server -> it is the gateway to the k8s cluster and facilitates the communication between its components; every service trying to access the cluster goes to the API Server, a relevant example for thos would be using the kubectl command, which goes to the API Server in order to interogate the state of the cluster's resources.
- - controller manager -> it monitors the state of the cluster and ensures that the current state matches the desired state kept by the configuration files, for example it ensures that the desires number of replicas from a deployment are running.
- - scheduler -> it asigns the newly created pods to the worker nodes based on resources, taints&tollerations, affinitty/anti-affinitty rules.
- - etcd -> it is a distributed key-value store that keeps the state of the cluster; it is considered the source of truth of the k8s cluster, and for interacting with it one uses the etcld.
+
+A pod is the smallest deployable unit in k8s, it is a wrapper over one or multiple containers which share the same network, storage and configuration. Pods are ephemeral by nature and are usally managed by Deployments.
+
+- What is the role of the kubelet on a worker node? (2 points)
+Kubelet is an agent running on every single worker node in a k8s cluster. It facilitates communication with the control plane (mainly the API Server) and ensures that containers described in PodSpecs are running and healthy. The kubelet interacts with the container runtime (such as containerd, Docker) to start, stop and monitor containers to match the desired state.
+
+- List 3 main components of the Kubernetes control plane and their purpose. (5 points)
+  
+ The control plane can be refered to as the "brain of the k8s cluster". It encapsulates the following components:
+ - The API Server -> it is the gateway to the k8s cluster and facilitates the communication between its components; every service trying to access the cluster goes to the API Server. A relevant example for this would be using the ```kubectl``` command, which communicates with the API Server in order to get the state of the cluster's resources.
+ - controller manager -> it monitors the state of the cluster and ensures that the current state matches the desired state kept by the configuration files, for example it ensures that the desired number of replicas from a deployment are running.
+ - scheduler -> it assigns the newly created pods to the worker nodes based on available resources, taints and tollerations, affinitty/anti-affinitty rules.
+ - etcd -> it is a distributed key-value store that keeps the state of the cluster; it is considered the source of truth of the k8s cluster. For interacting with it ```etcdl``` command is used.
    
 3. Working with Pods and Deployments (20 points)
-• - Create a Deployment YAML that launches 3 replicas of an NGINX container. Include
-ports and labels. (10 points)
-• - Apply the Deployment to your local cluster and share the output of `kubectl get
+
+- Create a Deployment YAML that launches 3 replicas of an NGINX container. Include ports and labels. (10 points)
+  
+- Apply the Deployment to your local cluster and share the output of `kubectl get
 deployments` and `kubectl get pods`. (5 points)
 
 <img width="494" height="45" alt="image" src="https://github.com/user-attachments/assets/eab97a60-2461-455b-b936-f2ce39bffdd6" />
@@ -313,7 +317,7 @@ deployments` and `kubectl get pods`. (5 points)
 <img width="537" height="73" alt="image" src="https://github.com/user-attachments/assets/54b9f216-8664-4113-976b-8cdb582c0605" />
 
 
-• - Update the Deployment to use a different NGINX image tag and apply a rolling update.
+- Update the Deployment to use a different NGINX image tag and apply a rolling update.
 Show the steps. (5 points)
 
 <img width="879" height="139" alt="image" src="https://github.com/user-attachments/assets/0e857457-cf12-49a7-a1f4-2c0dec40157d" />
@@ -325,27 +329,28 @@ Show the steps. (5 points)
 <img width="1006" height="342" alt="image" src="https://github.com/user-attachments/assets/9dedcff1-23ef-421b-b571-e97a8b63adae" />
 
 5. Kubernetes Services & Networking (15 points)
-• - Write a Service YAML manifest that exposes your NGINX Pods using type ClusterIP. (5
+- Write a Service YAML manifest that exposes your NGINX Pods using type ClusterIP. (5
 points)
 
 <img width="550" height="59" alt="image" src="https://github.com/user-attachments/assets/bef51853-a47b-435b-92a8-e24079ac9c91" />
 
 
-• - Explain how kube-proxy helps with service networking. (3 points)
-Kube-proxy runs on every worker node in the cluster and makes sure that the services inside of it are accesible. Because of it pods from the same node can be exposed togheter through one single port and ip address. Kube-proxy ensures the communication between services and pods, pods are ephemeral and if a services needs to communicate with a certain pod, if the ip address changes
+- Explain how kube-proxy helps with service networking. (3 points)
 
-• - What is the role of DNS in Kubernetes networking? (2 points)
+  
+Kube-proxy runs on every worker node in the cluster and makes sure that the services inside of it are accesible. Because of it, pods from the same node can be exposed togheter through one single port and ip address. Kube-proxy ensures the communication between services and pods, pods are ephemeral and if a service needs to communicate with a certain pod, if the ip address changes
+
+- What is the role of DNS in Kubernetes networking? (2 points)
 The DNS holds the name of the services to ensure communication between them and pods. A service in the default namespace can be accessed through service-name.default.svc.cluster.local.
 
-• - Bonus: Deploy a second Service using NodePort and share its exposed port and IP. (5
-points)
+- Bonus: Deploy a second Service using NodePort and share its exposed port and IP. (5 points)
 <img width="654" height="100" alt="image" src="https://github.com/user-attachments/assets/d4cd2544-0e89-440e-9741-dbac27a02f9d" />
 <img width="715" height="82" alt="image" src="https://github.com/user-attachments/assets/396bcd65-b6c4-4755-8409-0c9b7684aed7" />
 <img width="901" height="343" alt="image" src="https://github.com/user-attachments/assets/84c274b3-ceca-4827-bd43-09900b0621d8" />
 
 
 7. Helm Basics (10 points)
-• - Install Helm on your system and add the Bitnami chart repository. (2 points)
+- Install Helm on your system and add the Bitnami chart repository. (2 points)
 ```
 brew install helm
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
