@@ -357,9 +357,10 @@ Show the steps. (5 points)
 
 <img width="1006" height="342" alt="image" src="https://github.com/user-attachments/assets/9dedcff1-23ef-421b-b571-e97a8b63adae" />
 
+By changing the image of the deployment, a rolling update strategy will be triggered. The deployment will create a new replica set by creating new pods with the desired image and deleting the old ones, one by one, in order to ensure there is no downtime. This is the default deployment strategy in k8s.
+
 5. Kubernetes Services & Networking (15 points)
-- Write a Service YAML manifest that exposes your NGINX Pods using type ClusterIP. (5
-points)
+- Write a Service YAML manifest that exposes your NGINX Pods using type ClusterIP. (5 points)
 
 <img width="550" height="59" alt="image" src="https://github.com/user-attachments/assets/bef51853-a47b-435b-92a8-e24079ac9c91" />
 
