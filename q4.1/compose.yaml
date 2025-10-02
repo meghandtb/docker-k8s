@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  app:
+    build: .                     # Build Node.js app from the local Dockerfile
+    container_name: node-app
+    ports:
+      - "3000:3000"              # Expose app on http://localhost:3000
+    environment:
+      # Pass DB credentials from .env file into container
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - DB_HOST=db               # Service name of PostgreSQL container
+      - DB_PORT=5432             # Default PostgreSQL port
+    depends_on:
+      - db                       # Ensure database starts before the app
+    restart: always              # Restart if container stops
+
+  db:
+    image: postgres:16-alpine     # Lightweight official PostgreSQL image
+    container_name: postgres-db
+    environment:
+      - POSTGRES_USER=${DB_USER}  # Create DB user from .env
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - "5432:5432"               # Optional: expose DB on host (for tools like psql/pgAdmin)
+    volumes:
+      - pg_data:/var/lib/postgresql/data  # Persist DB data across restarts
+    restart: always
+
+volumes:
+  pg_data:                        # Named volume for database persistence
