@@ -362,18 +362,45 @@ By changing the image of the deployment, a rolling update strategy will be trigg
 5. Kubernetes Services & Networking (15 points)
 - Write a Service YAML manifest that exposes your NGINX Pods using type ClusterIP. (5 points)
 
+You can find the code for this manifest in k8s_section2/service.yaml. Run ```kubectl apply -f service.yaml``` in order to deploy it, then check the service with ```kubectl get svc```.
+
 <img width="550" height="59" alt="image" src="https://github.com/user-attachments/assets/bef51853-a47b-435b-92a8-e24079ac9c91" />
 
 
 - Explain how kube-proxy helps with service networking. (3 points)
 
   
-Kube-proxy runs on every worker node in the cluster and makes sure that the services inside of it are accesible. Because of it, pods from the same node can be exposed togheter through one single port and ip address. Kube-proxy ensures the communication between services and pods, pods are ephemeral and if a service needs to communicate with a certain pod, if the ip address changes
+Kube-proxy runs on every worker node in the cluster and mmanages the networking rules that allow services to communicate with pods. Because of it, pods from the same node can be exposed togheter through one single port and ip address. Considering the fact that pods are ephemeral and their IP address can change, kube-proxy ensures that the requests sent to a ClusterIP service or service name are correctly routed to the healthy pods.
 
 - What is the role of DNS in Kubernetes networking? (2 points)
-The DNS holds the name of the services to ensure communication between them and pods. A service in the default namespace can be accessed through service-name.default.svc.cluster.local.
+DNS in k8s provides service discovery by mapping service names to their virtual IPs (ClusterIPs). This allows pods and services to communicate with each other using DNS names instead of dynamic IPs. Therefore, for example, a service in the default namespace can be accessed through service-name.default.svc.cluster.local.
 
 - Bonus: Deploy a second Service using NodePort and share its exposed port and IP. (5 points)
+
+The manifest can be found in k8s_section2/nodePort_service.yaml or here:
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-nodeport
+  labels:
+    app: nginx
+spec:
+  type: NodePort
+  selector:
+    app: nginx
+  ports:
+    - port: 80          # Cluster-internal port
+      targetPort: 80    # Container port
+      nodePort: 30080   # Exposed on each node (range 30000-32767)
+      protocol: TCP
+
+```
+
+```
+kubectl apply -f nodePort_service.yaml
+```
 <img width="654" height="100" alt="image" src="https://github.com/user-attachments/assets/d4cd2544-0e89-440e-9741-dbac27a02f9d" />
 <img width="715" height="82" alt="image" src="https://github.com/user-attachments/assets/396bcd65-b6c4-4755-8409-0c9b7684aed7" />
 <img width="901" height="343" alt="image" src="https://github.com/user-attachments/assets/84c274b3-ceca-4827-bd43-09900b0621d8" />
