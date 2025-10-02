@@ -1,0 +1,21 @@
+apiversion: v1
+kind: Service
+metadata:
+  name: nginx
+  labels:
+    app: ngnix
+spec:
+  selector:
+    app: nginx
+  ports:
+  - protocol: tcp
+    port: 90
+    targetport: 80
+  type: ClusterIP
+
+port este portul expus in cluster in timp ce target port este portul expus in container
+
+clusterip expune in interiorul clusterului.
+nodeport deschide un port pe nod pentru comunicarea cu exteriorul 
+load balancer asigura comunicarea cu serviciile externe de obicei functioneaza cu un cloud provider si ingress.
+ofera un ip public si balanzeaza loadul intre noduri

@@ -1,0 +1,22 @@
+services:
+  nodeapp:
+    build: .
+    container_name: node_app
+    command: npm start
+    volumes:
+     - .:usr/src/app
+     ports:
+      - "3000/3000"
+    depends_on: posgresql
+    environment:
+      - DB_USER${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+  
+  posgresql:
+    image: postgres
+    container_name: postgresql
+    ports:
+     - "5432:5432"
+    volumes:
+     -db_data:/var/lib/data
