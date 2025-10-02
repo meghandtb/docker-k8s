@@ -400,6 +400,8 @@ spec:
 
 ```
 kubectl apply -f nodePort_service.yaml
+kubectl get svc
+
 ```
 <img width="654" height="100" alt="image" src="https://github.com/user-attachments/assets/d4cd2544-0e89-440e-9741-dbac27a02f9d" />
 <img width="715" height="82" alt="image" src="https://github.com/user-attachments/assets/396bcd65-b6c4-4755-8409-0c9b7684aed7" />
