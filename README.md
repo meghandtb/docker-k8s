@@ -307,6 +307,35 @@ Kubelet is an agent running on every single worker node in a k8s cluster. It fac
 3. Working with Pods and Deployments (20 points)
 
 - Create a Deployment YAML that launches 3 replicas of an NGINX container. Include ports and labels. (10 points)
+
+The manifest for the deployment can be found in the root of the *k8s_section2* or here:
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
+
+```
+
+Run ``` kubectl apply -f deployment.yaml``` in order to create it.
   
 - Apply the Deployment to your local cluster and share the output of `kubectl get
 deployments` and `kubectl get pods`. (5 points)
