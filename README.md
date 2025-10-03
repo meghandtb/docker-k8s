@@ -544,6 +544,62 @@ So, managed node groups give you control over the underlying EC2 instances, whil
 
 - Create an IAM role and associate it with a Kubernetes Service Account using IRSA (IAM Roles for Service Accounts). Share the steps. (10 points)
 
+First step is to create an EKS cluster. In the AWS management console -> Search EKS -> Create Cluster.
+Give the cluster a name, create the Cluster IAM role and Node IAM role, refresh and associate them to the cluster.
+I also wanted to use a separate VPC, so I created one with subnets.
+<img width="1477" height="711" alt="image" src="https://github.com/user-attachments/assets/27e93709-0f50-4075-8d6c-3e82a05add59" />
+
+After you hit the Create button, the cluster stays in *Creating* status for a couple of minutes.
+
+<img width="1510" height="734" alt="image" src="https://github.com/user-attachments/assets/7c1e3bb6-1d7b-490e-8ca1-fb099de3e635" />
+
+Once the Cluster is in *active* state you can see the controlplane node and can start adding worker nodes.
+<img width="1231" height="720" alt="image" src="https://github.com/user-attachments/assets/d6ebdbef-86b4-4e59-a0eb-c704a2b46edb" />
+
+Next you go to the Compute section and select *Add node group* so we can add some worker nodes.
+
+<img width="1216" height="360" alt="image" src="https://github.com/user-attachments/assets/cea7f705-a520-4349-aa04-895f60c93b77" />
+Use t3.small for creatign the instances, this is just for testing purposes so no computing power is needed.
+<img width="1232" height="612" alt="image" src="https://github.com/user-attachments/assets/81ff6d8c-b71a-4182-bc1c-fa456a49f901" />
+
+
+Check if an OIDC provider is associated with my k8s cluster, since this will be needed fpr IRSA. In k8s OIDC (OpenID Connect) is used so that k8s service accounts cand request temporary AWS credentials.
+
+```
+aws eks describe-cluster --name eks-cluster-dada --region eu-west-1 --query "cluster.identity.oidc.issuer" --output text
+```
+Then I created an IAM Identity Provider. Go to IAM -> Identity providers -> Add provider 
+
+<img width="1497" height="761" alt="image" src="https://github.com/user-attachments/assets/2ded1deb-d736-442f-b2cc-0adc5d0ca9cf" />
+
+
+Paste the provider URL we just got from the previous command, and hit *Add provider*.
+
+Next we need to create an IAM Policy. I will trying to simulate fiving a pod access to an S3 bucket in my cluster.
+
+I have created a Policy which provides List and Read access to S3 buckets as seen bellow:
+
+<img width="1233" height="536" alt="image" src="https://github.com/user-attachments/assets/7d43969d-cde3-407a-b015-6f3db4825477" />
+
+
+
+Next I have created an IAM role for the service account (IRSA) to which I associated the policy to.
+
+
+
+Go to IAM -> Roles -> Create Role
+
+<img width="1267" height="676" alt="image" src="https://github.com/user-attachments/assets/726c43cd-3c47-43f4-9c25-5fd36e723bd4" />
+
+Choose the Identity provider we just created.
+
+Select *Add condition* and fill in as follows:
+
+<img width="1223" height="573" alt="image" src="https://github.com/user-attachments/assets/950ab844-803d-4f92-a9bd-868e059f27cc" />
+
+Add the *read-s3* policy we just created, give it a name and hit *Create*.
+
+
 10. Challenge (10 points)
 - Deploy a 2-tier app using Helm charts: backend (Redis) and frontend (web app). Ensure Services connect the two.
 - Include Service YAMLs, any custom values.yaml overrides, and a short explanation of how traffic flows through the system.
