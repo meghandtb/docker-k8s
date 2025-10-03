@@ -659,3 +659,27 @@ helm install two-tier-app-2 . -n two-tier-app -f custom-values.yaml
 Now we can see 3 replicas for the frontend pod and 2 for the backend one:
 <img width="668" height="251" alt="image" src="https://github.com/user-attachments/assets/8f769d5f-9403-4449-900d-f82a85cf7bb9" />
 
+Traffic flow:
+
+*User -->> Frontend Service*
+
+Users send requests to the frontend Service (LoadBalancer or NodePort depending on config).
+
+The Service routes traffic to one of the frontend Pods which runs the web app.
+
+*Frontend Pod -->> Backend Service*
+
+Inside the cluster, the frontend Pod connects to Redis using the backend Service hostname - *two-tier-app-backend*.
+
+Kubernetes DNS resolves that name to the ClusterIP of the backend Service.
+
+The request is forwarded to the backend pods running Redis.
+
+*Backend Pod (Redis) processes data*
+
+Redis stores or retrieves data and sends the response back to the frontend Pod.
+
+*Frontend Pod -->> User*
+
+The frontend Pod sends the result aka the API response of the web page and returns it to the user through the frontend Service.
+
