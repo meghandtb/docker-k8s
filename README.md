@@ -603,3 +603,59 @@ Add the *read-s3* policy we just created, give it a name and hit *Create*.
 10. Challenge (10 points)
 - Deploy a 2-tier app using Helm charts: backend (Redis) and frontend (web app). Ensure Services connect the two.
 - Include Service YAMLs, any custom values.yaml overrides, and a short explanation of how traffic flows through the system.
+
+The code cand be found in the root of *k8s_section3*.
+First run the command 
+```
+helm create two-tier-app
+```
+
+This will create the folder structure and it will add some files with dummy code which we will eventually replace.
+After the needed manifests are added, run:
+
+
+```
+cd two-tier-app/
+kubectl create namespace two-tier-app
+helm install two-tier-app . -n two-tier-app
+```
+
+I have created a new namespace, to have a better separation of the resources and not to get confused.
+
+<img width="660" height="96" alt="image" src="https://github.com/user-attachments/assets/cb8161ec-aa92-447d-9744-ff7ef638cf98" />
+
+Now we need to check that the resources were created correctly:
+
+```
+kubectl get pods -n two-tier-app
+kubectl get svc -n wo-tier-app
+```
+<img width="658" height="127" alt="image" src="https://github.com/user-attachments/assets/ba5a340b-f6a5-4aa8-bb10-9fa43e501a64" />
+
+Start the application with ``` minikube service two-tier-frontend ```
+<img width="670" height="222" alt="image" src="https://github.com/user-attachments/assets/b3dfbbf1-dd06-4316-ac97-6bab98042db7" />
+
+<img width="597" height="283" alt="image" src="https://github.com/user-attachments/assets/6a8bca3f-8b58-4cdd-b797-b5ab413751f7" />
+
+BONUS: we can also set some variables to ve overwritten at deployment, like so:
+
+```
+#custom-values.yaml
+
+frontend:
+  replicas: 3
+  service:
+    type: NodePort
+
+backend:
+  replicas: 2
+
+```
+
+```
+helm install two-tier-app-2 . -n two-tier-app -f custom-values.yaml
+```
+
+Now we can see 3 replicas for the frontend pod and 2 for the backend one:
+<img width="668" height="251" alt="image" src="https://github.com/user-attachments/assets/8f769d5f-9403-4449-900d-f82a85cf7bb9" />
+
